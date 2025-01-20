@@ -3,6 +3,22 @@ trap 'cd $(pwd)' EXIT
 cd "$root" || exit
 git add -A >/dev/null
 
+new_files=$(git diff --cached --name-only --diff-filter=A)
+if [ -n "$new_files" ]; then
+  echo "New file(s) detected!"
+  echo
+  echo "$new_files"
+  echo
+  printf "Are you sure this file(s) are neccessary? [y/n]: "
+  read -r answer
+  last_char=${answer#"${answer%?}"}
+  if [ "$last_char" != "y" ]; then
+    echo "Aborted"
+    git reset >/dev/null
+    exit 1
+  fi
+fi
+
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 packages=$(
   nix flake show --json |
@@ -49,26 +65,9 @@ nix flake check --log-lines 200 --quiet || (git reset >/dev/null && exit 1)
 echo "nix flake check finished successfully in $(($(date +%s) - start))s"
 
 flag=${1:-}
-
 if [ "$flag" = "--no-commit" ]; then
   git reset >/dev/null
   exit 0
-fi
-
-new_files=$(git diff --cached --name-only --diff-filter=A)
-if [ -n "$new_files" ]; then
-  echo "New file(s) detected!"
-  echo
-  echo "$new_files"
-  echo
-  printf "Are you sure this file(s) are neccessary? [y/n]: "
-  read -r answer
-  last_char=${answer#"${answer%?}"}
-  if [ "$last_char" != "y" ]; then
-    echo "Aborted"
-    git reset >/dev/null
-    exit 1
-  fi
 fi
 
 start=$(date +%s)
