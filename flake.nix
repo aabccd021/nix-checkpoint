@@ -26,7 +26,7 @@
 
 
       packages = {
-        checkpoint = checkpoint;
+        default = checkpoint;
         formatting = treefmtEval.config.build.check self;
         snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
           mkdir -p $out/snapshot/nested
