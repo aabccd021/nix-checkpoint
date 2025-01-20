@@ -18,15 +18,15 @@
         vendorHash = "sha256-BPxPonschTe8sWc5pATAJuxpn7dgRBeVZQMHUJKpmTk=";
       };
 
-      checkpoint = pkgs.writeShellApplication {
-        name = "checkpoint";
+      nix-checkpoint = pkgs.writeShellApplication {
+        name = "nix-checkpoint";
         runtimeInputs = [ aicommitPkgs pkgs.findutils ];
         text = builtins.readFile ./checkpoint.sh;
       };
 
 
       packages = {
-        default = checkpoint;
+        default = nix-checkpoint;
         formatting = treefmtEval.config.build.check self;
         snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
           mkdir -p $out/snapshot/nested
@@ -53,7 +53,7 @@
 
       devShells.x86_64-linux.default = pkgs.mkShellNoCC {
         buildInputs = [
-          checkpoint
+          nix-checkpoint
         ];
       };
 
