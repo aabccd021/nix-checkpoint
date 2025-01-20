@@ -3,6 +3,7 @@ trap 'cd $(pwd)' EXIT
 cd "$root" || exit
 git add -A >/dev/null
 
+system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 packages=$(
   nix flake show --json |
     nix run nixpkgs#jq -- --raw-output ".packages[\"$system\"] | keys | .[]" 2>/dev/null ||
@@ -34,7 +35,6 @@ if [ -n "$checkpoint_fix" ]; then
   echo "nix run .#checkpoint-fix finished successfully in $(($(date +%s) - start))s"
 fi
 
-system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 has_formatter=$(nix flake show --json | nix run nixpkgs#jq -- ".formatter[\"$system\"]" 2>/dev/null || true)
 if [ -n "$has_formatter" ] && [ "$has_formatter" != "null" ]; then
   start=$(date +%s)
