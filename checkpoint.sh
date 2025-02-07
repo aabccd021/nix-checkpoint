@@ -1,3 +1,5 @@
+flag=${1:-}
+
 root=$(git rev-parse --show-toplevel)
 trap 'cd $(pwd)' EXIT
 cd "$root" || exit
@@ -40,6 +42,11 @@ if [ -n "$snapshots" ]; then
   done
 fi
 
+if [ "$flag" = "--snapshot" ] || [ "$flag" = "--no-fix" ]; then
+  git reset >/dev/null
+  exit 0
+fi
+
 checkpoint_fix=$(
   nix flake show --json |
     nix run nixpkgs#jq -- --raw-output ".apps[\"$system\"][\"checkpoint-fix\"] | keys | .[]" 2>/dev/null ||
@@ -51,11 +58,20 @@ if [ -n "$checkpoint_fix" ]; then
   echo "nix run .#checkpoint-fix finished successfully in $(($(date +%s) - start))s"
 fi
 
+if [ "$flag" = "--fix" ] || [ "$flag" = "--no-fmt" ]; then
+  git add -A >/dev/null
+fi
+
 has_formatter=$(nix flake show --json | nix run nixpkgs#jq -- ".formatter[\"$system\"]" 2>/dev/null || true)
 if [ -n "$has_formatter" ] && [ "$has_formatter" != "null" ]; then
   start=$(date +%s)
   nix fmt
   echo "nix fmt finished successfully in $(($(date +%s) - start))s"
+fi
+
+if [ "$flag" = "--fmt" ] || [ "$flag" = "--no-check" ]; then
+  git reset >/dev/null
+  exit 0
 fi
 
 git add -A >/dev/null
@@ -64,8 +80,7 @@ start=$(date +%s)
 nix flake check --log-lines 200 --quiet || (git reset >/dev/null && exit 1)
 echo "nix flake check finished successfully in $(($(date +%s) - start))s"
 
-flag=${1:-}
-if [ "$flag" = "--no-commit" ]; then
+if [ "$flag" = "--check" ] || [ "$flag" = "--no-commit" ]; then
   git reset >/dev/null
   exit 0
 fi
@@ -88,12 +103,21 @@ OPENAI_API_KEY="$openai_api_key" \
 
 echo "Commit message generated successfully in $(($(date +%s) - start))s"
 
+if [ "$flag" = "--commit" ] || [ "$flag" = "--no-push" ]; then
+  exit 0
+fi
+
 start=$(date +%s)
 
 git pull --quiet --rebase
 git push --quiet
 
 echo "Respository pushed successfully in $(($(date +%s) - start))s"
+
+if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
+  exit 0
+fi
+
 nixosConfigurations=$(
   nix flake show --json |
     nix run nixpkgs#jq -- --raw-output ".nixosConfigurations | keys | .[]" 2>/dev/null ||
