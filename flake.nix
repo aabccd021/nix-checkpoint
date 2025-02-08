@@ -64,18 +64,5 @@
 
       formatter.x86_64-linux = treefmtEval.config.build.wrapper;
 
-      apps.x86_64-linux = {
-        checkpoint-fix = {
-          type = "app";
-          program = toString (
-            pkgs.writeShellScript "checkpoint-fix" ''
-              echo "running checkpoint-fix"
-              sleep 1
-              echo "done checkpoint-fix"
-            ''
-          );
-        };
-      };
-
     };
 }
