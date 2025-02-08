@@ -5,26 +5,12 @@ trap 'cd $(pwd)' EXIT
 cd "$root" || exit
 git add -A >/dev/null
 
-new_files=$(git diff --cached --name-only --diff-filter=A)
-if [ -n "$new_files" ]; then
-  echo "New file(s) detected!"
-  echo
-  echo "$new_files"
-  echo
-  printf "Are you sure this file(s) are neccessary? [y/n]: "
-  read -r answer
-  last_char=${answer#"${answer%?}"}
-  if [ "$last_char" != "y" ]; then
-    echo "Aborted"
-    git reset >/dev/null
-    exit 1
-  fi
-fi
-
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
+flake_details=$(nix flake show --json)
+
 packages=$(
-  nix flake show --json |
-    nix run nixpkgs#jq -- --raw-output ".packages[\"$system\"] | keys | .[]" 2>/dev/null ||
+  echo "$flake_details" |
+    jq --raw-output ".packages[\"$system\"] | keys | .[]" 2>/dev/null ||
     true
 )
 snapshots=$(echo "$packages" | grep '^snapshot-' || true)
@@ -42,27 +28,49 @@ if [ -n "$snapshots" ]; then
   done
 fi
 
-if [ "$flag" = "--snapshot" ] || [ "$flag" = "--no-fix" ]; then
+if [ "$flag" = "--snapshot" ] || [ "$flag" = "--no-add" ]; then
   git reset >/dev/null
   exit 0
 fi
 
-checkpoint_fix=$(
-  nix flake show --json |
-    nix run nixpkgs#jq -- --raw-output ".apps[\"$system\"][\"checkpoint-fix\"] | keys | .[]" 2>/dev/null ||
+new_files=$(git diff --cached --name-only --diff-filter=A)
+if [ -n "$new_files" ]; then
+  echo "New file(s) detected!"
+  echo
+  echo "$new_files"
+  echo
+  printf "Are you sure this file(s) are neccessary? [y/n]: "
+  read -r answer
+  last_char=${answer#"${answer%?}"}
+  if [ "$last_char" != "y" ]; then
+    echo "Aborted"
+    git reset >/dev/null
+    exit 1
+  fi
+fi
+
+if [ "$flag" = "--add" ] || [ "$flag" = "--no-fix" ]; then
+  git reset >/dev/null
+  exit 0
+fi
+
+fix=$(
+  echo "$flake_details" |
+    jq --raw-output ".apps[\"$system\"][\"fix\"] | keys | .[]" 2>/dev/null ||
     true
 )
-if [ -n "$checkpoint_fix" ]; then
+if [ -n "$fix" ]; then
   start=$(date +%s)
-  nix run ".#checkpoint-fix"
-  echo "nix run .#checkpoint-fix finished successfully in $(($(date +%s) - start))s"
+  nix run ".#fix"
+  echo "nix run .#fix finished successfully in $(($(date +%s) - start))s"
 fi
 
 if [ "$flag" = "--fix" ] || [ "$flag" = "--no-fmt" ]; then
   git add -A >/dev/null
 fi
 
-has_formatter=$(nix flake show --json | nix run nixpkgs#jq -- ".formatter[\"$system\"]" 2>/dev/null || true)
+has_formatter=$(echo "$flake_details" |
+  jq ".formatter[\"$system\"]" 2>/dev/null || true)
 if [ -n "$has_formatter" ] && [ "$has_formatter" != "null" ]; then
   start=$(date +%s)
   nix fmt
@@ -119,8 +127,8 @@ if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
 fi
 
 nixosConfigurations=$(
-  nix flake show --json |
-    nix run nixpkgs#jq -- --raw-output ".nixosConfigurations | keys | .[]" 2>/dev/null ||
+  echo "$flake_details" |
+    jq --raw-output ".nixosConfigurations | keys | .[]" 2>/dev/null ||
     true
 )
 package_gcroots=$(echo "$packages" | grep '^gcroot-' || true)

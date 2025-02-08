@@ -20,13 +20,14 @@
 
       nix-checkpoint = pkgs.writeShellApplication {
         name = "nix-checkpoint";
-        runtimeInputs = [ aicommitPkgs pkgs.findutils ];
-        text = builtins.readFile ./checkpoint.sh;
+        runtimeInputs = [ aicommitPkgs pkgs.findutils pkgs.jq ];
+        text = builtins.readFile ./nix-checkpoint.sh;
       };
 
 
       packages = {
         default = nix-checkpoint;
+        nix-checkpoint = nix-checkpoint;
         formatting = treefmtEval.config.build.check self;
         snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
           mkdir -p $out/snapshot/nested
