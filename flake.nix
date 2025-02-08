@@ -64,5 +64,18 @@
 
       formatter.x86_64-linux = treefmtEval.config.build.wrapper;
 
+      apps.x86_64-linux = {
+        fix = {
+          type = "app";
+          program = toString (
+            pkgs.writeShellScript "fix" ''
+              echo "running fix"
+              sleep 1
+              echo "done fix"
+            ''
+          );
+        };
+      };
+
     };
 }
