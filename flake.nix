@@ -46,6 +46,7 @@
         programs.shfmt.enable = true;
         programs.shellcheck.enable = true;
         settings.formatter.shellcheck.options = [ "-s" "sh" ];
+        settings.global.excludes = [ "LICENSE" ];
       };
 
     in
