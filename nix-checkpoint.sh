@@ -114,7 +114,7 @@ fi
 
 OPENAI_API_KEY="$openai_api_key" \
   timeout 10 ai-commit --auto-commit >/dev/null 2>&1 ||
-  git commit --message 'checkpoint'
+  git commit --edit --message "checkpoint"
 
 echo "Commit message generated successfully in $(($(date +%s) - start))s"
 
