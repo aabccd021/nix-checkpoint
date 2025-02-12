@@ -3,7 +3,7 @@ flag=${1:-}
 root=$(git rev-parse --show-toplevel)
 trap 'cd $(pwd)' EXIT
 cd "$root" || exit
-git add -A >/dev/null
+git add --all >/dev/null
 
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 flake_details=$(nix flake show --json)
@@ -13,22 +13,28 @@ packages=$(
     jq --raw-output ".packages[\"$system\"] | keys | .[]" 2>/dev/null ||
     true
 )
+
+create_snapshot() {
+  start=$(date +%s)
+  result=$(nix build --no-link --print-out-paths ".#$1")
+  files=$(find -L "$result" -type f -printf '%P\n')
+  for file in $files; do
+    mkdir -p "$(dirname "$file")"
+    cp -L "$result/$file" "$file"
+    chmod 644 "$file"
+  done
+  echo "$snapshot created successfully in $(($(date +%s) - start))s"
+}
+
 snapshots=$(echo "$packages" | grep '^snapshot-' || true)
 if [ -n "$snapshots" ]; then
   for snapshot in $snapshots; do
-    start=$(date +%s)
-    result=$(nix build --no-link --print-out-paths ".#$snapshot")
-    files=$(find -L "$result" -type f -printf '%P\n')
-    for file in $files; do
-      mkdir -p "$(dirname "$file")"
-      cp -L "$result/$file" "$file"
-      chmod 644 "$file"
-    done
-    echo "$snapshot created successfully in $(($(date +%s) - start))s"
+    create_snapshot "$snapshot" &
   done
+  wait
 fi
 
-if [ "$flag" = "--snapshot" ] || [ "$flag" = "--no-add" ]; then
+if [ "$flag" = "--snapshot" ]; then
   git reset >/dev/null
   exit 0
 fi
@@ -49,8 +55,9 @@ if [ -n "$new_files" ]; then
   fi
 fi
 
-if [ "$flag" = "--add" ] || [ "$flag" = "--no-fix" ]; then
-  git reset >/dev/null
+git add --all >/dev/null
+
+if [ "$flag" = "--no-fix" ]; then
   exit 0
 fi
 
@@ -66,7 +73,8 @@ if [ -n "$fix" ]; then
 fi
 
 if [ "$flag" = "--fix" ] || [ "$flag" = "--no-fmt" ]; then
-  git add -A >/dev/null
+  git reset >/dev/null
+  exit 0
 fi
 
 has_formatter=$(echo "$flake_details" |
@@ -82,9 +90,8 @@ if [ "$flag" = "--fmt" ] || [ "$flag" = "--no-check" ]; then
   exit 0
 fi
 
-git add -A >/dev/null
-
 start=$(date +%s)
+git add --all >/dev/null
 nix flake check --log-lines 200 --quiet || (git reset >/dev/null && exit 1)
 echo "nix flake check finished successfully in $(($(date +%s) - start))s"
 
@@ -107,7 +114,7 @@ fi
 
 OPENAI_API_KEY="$openai_api_key" \
   timeout 10 ai-commit --auto-commit >/dev/null 2>&1 ||
-  git commit --all --message 'checkpoint'
+  git commit --message 'checkpoint'
 
 echo "Commit message generated successfully in $(($(date +%s) - start))s"
 
