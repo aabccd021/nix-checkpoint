@@ -92,7 +92,7 @@ fi
 
 start=$(date +%s)
 git add --all >/dev/null
-nix flake check --log-lines 200 --quiet || (git reset >/dev/null && exit 1)
+nix flake check --quiet || (git reset >/dev/null && exit 1)
 echo "nix flake check finished successfully in $(($(date +%s) - start))s"
 
 if [ "$flag" = "--check" ] || [ "$flag" = "--no-commit" ]; then
