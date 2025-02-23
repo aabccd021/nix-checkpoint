@@ -24,7 +24,6 @@
           aicommitPkgs
           pkgs.findutils
           pkgs.jq
-          pkgs.nix-fast-build
         ];
         text = builtins.readFile ./nix-checkpoint.sh;
       };
