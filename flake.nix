@@ -36,7 +36,7 @@
         formatting = treefmtEval.config.build.check self;
         snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
           mkdir -p "$out/snapshot/nested"
-          echo "bar" > "$out/snapshot/nested/file.txt"
+          echo "baz" > "$out/snapshot/nested/file.txt"
         '';
       };
 
