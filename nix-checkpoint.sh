@@ -14,22 +14,19 @@ packages=$(
     true
 )
 
-create_snapshot() {
-  start=$(date +%s)
-  result=$(nix build --no-link --print-out-paths ".#$1")
-  files=$(find -L "$result" -type f -printf '%P\n')
-  for file in $files; do
-    mkdir -p "$(dirname "$file")"
-    cp -L "$result/$file" "$file"
-    chmod 644 "$file"
-  done
-  echo "$snapshot created successfully in $(($(date +%s) - start))s"
-}
-
 snapshots=$(echo "$packages" | grep '^snapshot-' || true)
 if [ -n "$snapshots" ]; then
   for snapshot in $snapshots; do
-    create_snapshot "$snapshot" &
+    start=$(date +%s)
+    result=$(nix build --no-link --print-out-paths ".#$1")
+    files=$(find -L "$result" -type f -printf '%P\n')
+    for file in $files; do
+      mkdir -p "$(dirname "$file")"
+      cp -L "$result/$file" "$file"
+      chmod 644 "$file"
+    done
+    echo "$snapshot created successfully in $(($(date +%s) - start))s"
+
   done
   wait
 fi
