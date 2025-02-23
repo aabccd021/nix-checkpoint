@@ -92,7 +92,10 @@ fi
 
 start=$(date +%s)
 git add --all >/dev/null
-nix-fast-build --skip-cached --flake ".#checks.$system" || (git reset >/dev/null && exit 1)
+nix-fast-build --no-link --skip-cached --flake ".#checks.$system" || (git reset >/dev/null && exit 1)
+echo "nix-fast-build finished successfully in $(($(date +%s) - start))s"
+
+start=$(date +%s)
 nix flake check --quiet || (git reset >/dev/null && exit 1)
 echo "nix flake check finished successfully in $(($(date +%s) - start))s"
 
