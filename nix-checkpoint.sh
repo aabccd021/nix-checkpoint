@@ -174,7 +174,7 @@ if [ -n "$gcroots" ]; then
       --no-link \
       --skip-cached \
       --out-link ".gcroot/$gcroot" \
-      --flake ".#$gcroot"
+      --flake ".#packages.$system.$gcroot"
     echo "GC root $gcroot created successfully in $(($(date +%s) - start))s"
   done
 fi
