@@ -155,10 +155,6 @@ if [ -n "$gcroots" ]; then
   rm -rf .gcroot
   mkdir -p .gcroot
   for gcroot in $gcroots; do
-    start=$(date +%s)
-
     nohup nix build --out-link ".gcroot/$gcroot" .#"$gcroot" </dev/null >/dev/null 2>&1 &
-
-    echo "GC root $gcroot created successfully in $(($(date +%s) - start))s"
   done
 fi
