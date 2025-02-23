@@ -18,7 +18,6 @@ create_snapshot() {
   start=$(date +%s)
   out=$(mktemp)
 
-  set -x
   nix-fast-build \
     --no-link \
     --skip-cached \
