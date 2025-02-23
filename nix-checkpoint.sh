@@ -18,11 +18,12 @@ create_snapshot() {
   start=$(date +%s)
   out=$(mktemp)
 
+  set -x
   nix-fast-build \
     --no-link \
     --skip-cached \
     --out-link "$out" \
-    ".#packages.$system.$1"
+    --flake ".#packages.$system.$1"
 
   files=$(find -L "$out" -type f -printf '%P\n')
   for file in $files; do
@@ -173,7 +174,7 @@ if [ -n "$gcroots" ]; then
       --no-link \
       --skip-cached \
       --out-link ".gcroot/$gcroot" \
-      .#"$gcroot"
+      --flake ".#$gcroot"
     echo "GC root $gcroot created successfully in $(($(date +%s) - start))s"
   done
 fi
