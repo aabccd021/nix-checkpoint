@@ -6,9 +6,13 @@
       url = "github:nguyenvanduocit/ai-commit";
       flake = false;
     };
+    nix-fast-build = {
+      url = "github:Mic92/nix-fast-build";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { nixpkgs, aicommit, treefmt-nix, self }:
+  outputs = { self, nixpkgs, aicommit, treefmt-nix, nix-fast-build }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
@@ -20,7 +24,12 @@
 
       nix-checkpoint = pkgs.writeShellApplication {
         name = "nix-checkpoint";
-        runtimeInputs = [ aicommitPkgs pkgs.findutils pkgs.jq ];
+        runtimeInputs = [
+          aicommitPkgs
+          pkgs.findutils
+          pkgs.jq
+          nix-fast-build.packages.x86_64-linux.nix-fast-build
+        ];
         text = builtins.readFile ./nix-checkpoint.sh;
       };
 
@@ -30,8 +39,8 @@
         nix-checkpoint = nix-checkpoint;
         formatting = treefmtEval.config.build.check self;
         snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
-          mkdir -p $out/snapshot/nested
-          echo "foo" > $out/snapshot/nested/file.txt
+          mkdir -p "$out/snapshot/nested"
+          echo "foo" > "$out/snapshot/nested/file.txt"
         '';
       };
 
