@@ -16,11 +16,18 @@ packages=$(
 
 create_snapshot() {
   start=$(date +%s)
-  result=$(nix build --no-link --print-out-paths ".#$1")
-  files=$(find -L "$result" -type f -printf '%P\n')
+  out=$(mktemp)
+
+  nix-fast-build \
+    --no-link \
+    --skip-cached \
+    --out-link "$out" \
+    ".#packages.$system.$1"
+
+  files=$(find -L "$out" -type f -printf '%P\n')
   for file in $files; do
     mkdir -p "$(dirname "$file")"
-    cp -L "$result/$file" "$file"
+    cp -L "$out/$file" "$file"
     chmod 644 "$file"
   done
   echo "$snapshot created successfully in $(($(date +%s) - start))s"
@@ -92,7 +99,13 @@ fi
 
 start=$(date +%s)
 git add --all >/dev/null
-nix-fast-build --no-link --skip-cached --flake ".#checks.$system" || (git reset >/dev/null && exit 1)
+
+nix-fast-build \
+  --no-link \
+  --skip-cached \
+  --flake ".#checks.$system" ||
+  (git reset >/dev/null && exit 1)
+
 echo "nix-fast-build finished successfully in $(($(date +%s) - start))s"
 
 start=$(date +%s)
@@ -156,7 +169,11 @@ if [ -n "$gcroots" ]; then
   mkdir -p .gcroot
   for gcroot in $gcroots; do
     start=$(date +%s)
-    nix build --out-link ".gcroot/$gcroot" .#"$gcroot"
+    nix-fast-build \
+      --no-link \
+      --skip-cached \
+      --out-link ".gcroot/$gcroot" \
+      .#"$gcroot"
     echo "GC root $gcroot created successfully in $(($(date +%s) - start))s"
   done
 fi

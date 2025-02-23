@@ -6,13 +6,9 @@
       url = "github:nguyenvanduocit/ai-commit";
       flake = false;
     };
-    nix-fast-build = {
-      url = "github:Mic92/nix-fast-build";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { self, nixpkgs, aicommit, treefmt-nix, nix-fast-build }:
+  outputs = { self, nixpkgs, aicommit, treefmt-nix }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
@@ -28,7 +24,7 @@
           aicommitPkgs
           pkgs.findutils
           pkgs.jq
-          nix-fast-build.packages.x86_64-linux.nix-fast-build
+          pkgs.nix-fast-build
         ];
         text = builtins.readFile ./nix-checkpoint.sh;
       };
