@@ -17,6 +17,7 @@ packages=$(
 create_snapshot() {
   start=$(date +%s)
   out=$(mktemp)
+  rm -f "$out"
 
   nix-fast-build \
     --no-link \
