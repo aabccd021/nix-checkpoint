@@ -7,7 +7,7 @@ git add --all >/dev/null
 
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 
-auto-follow
+auto-follow --in-place
 
 flake_details=$(nix flake show --json)
 
