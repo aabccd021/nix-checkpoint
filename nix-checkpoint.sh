@@ -6,6 +6,9 @@ cd "$root" || exit
 git add --all >/dev/null
 
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
+
+auto-follow
+
 flake_details=$(nix flake show --json)
 
 packages=$(

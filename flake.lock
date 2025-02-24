@@ -16,7 +16,41 @@
         "type": "github"
       }
     },
+    "nix-auto-follow": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1736285518,
+        "narHash": "sha256-UaTTuBs+3+jT360fyfHdjpa4MhSFoMz+D1kp0rr+FwM=",
+        "owner": "fzakaria",
+        "repo": "nix-auto-follow",
+        "rev": "21646a12a47769707d46be8ab7be5e22c4f3224a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "fzakaria",
+        "repo": "nix-auto-follow",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
+      "locked": {
+        "lastModified": 1736061677,
+        "narHash": "sha256-DjkQPnkAfd7eB522PwnkGhOMuT9QVCZspDpJJYyOj60=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "cbd8ec4de4469333c82ff40d057350c30e9f7d36",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-24.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1738680400,
         "narHash": "sha256-ooLh+XW8jfa+91F1nhf9OF7qhuA/y1ChLx6lXDNeY5U=",
@@ -32,7 +66,7 @@
         "type": "github"
       }
     },
-    "nixpkgs_2": {
+    "nixpkgs_3": {
       "locked": {
         "lastModified": 1735554305,
         "narHash": "sha256-zExSA1i/b+1NMRhGGLtNfFGXgLtgo+dcuzHzaWA6w3Q=",
@@ -51,13 +85,14 @@
     "root": {
       "inputs": {
         "aicommit": "aicommit",
-        "nixpkgs": "nixpkgs",
+        "nix-auto-follow": "nix-auto-follow",
+        "nixpkgs": "nixpkgs_2",
         "treefmt-nix": "treefmt-nix"
       }
     },
     "treefmt-nix": {
       "inputs": {
-        "nixpkgs": "nixpkgs_2"
+        "nixpkgs": "nixpkgs_3"
       },
       "locked": {
         "lastModified": 1738680491,

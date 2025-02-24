@@ -2,13 +2,14 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    nix-auto-follow.url = "github:fzakaria/nix-auto-follow";
     aicommit = {
       url = "github:nguyenvanduocit/ai-commit";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, aicommit, treefmt-nix }:
+  outputs = { self, nixpkgs, aicommit, treefmt-nix, nix-auto-follow }:
     let
       pkgs = nixpkgs.legacyPackages.x86_64-linux;
 
@@ -24,6 +25,7 @@
           aicommitPkgs
           pkgs.findutils
           pkgs.jq
+          nix-auto-follow.packages.x86_64-linux.default
         ];
         text = builtins.readFile ./nix-checkpoint.sh;
       };
