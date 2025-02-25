@@ -7,8 +7,6 @@ git add --all >/dev/null
 
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 
-auto-follow --in-place
-
 flake_details=$(nix flake show --json)
 
 packages=$(
@@ -83,6 +81,9 @@ if [ "$flag" = "--fix" ] || [ "$flag" = "--no-fmt" ]; then
   git reset >/dev/null
   exit 0
 fi
+
+auto-follow --in-place
+auto-follow --check
 
 has_formatter=$(echo "$flake_details" |
   jq ".formatter[\"$system\"]" 2>/dev/null || true)
