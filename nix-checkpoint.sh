@@ -82,8 +82,8 @@ if [ "$flag" = "--fix" ] || [ "$flag" = "--no-fmt" ]; then
   exit 0
 fi
 
-auto-follow --in-place >/dev/null
-auto-follow --check
+auto-follow --in-place
+auto-follow --check >/dev/null
 
 has_formatter=$(echo "$flake_details" |
   jq ".formatter[\"$system\"]" 2>/dev/null || true)
