@@ -82,7 +82,7 @@ if [ "$flag" = "--fix" ] || [ "$flag" = "--no-fmt" ]; then
   exit 0
 fi
 
-auto-follow --in-place
+auto-follow --in-place >/dev/null
 auto-follow --check
 
 has_formatter=$(echo "$flake_details" |
