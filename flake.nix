@@ -53,6 +53,8 @@
         buildInputs = [ pkgs.nix-checkpoint ];
       };
 
+      overlays.default = overlay;
+
       packages.x86_64-linux = gcroot;
 
       checks.x86_64-linux = gcroot;
