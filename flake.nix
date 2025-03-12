@@ -11,29 +11,19 @@
 
   outputs = { self, nixpkgs, aicommit, treefmt-nix, nix-auto-follow }:
     let
-      pkgs = nixpkgs.legacyPackages.x86_64-linux;
+      overlay = (final: prev:
+        (nix-auto-follow.overlays.default final prev)
+        // (import ./default.nix { pkgs = final; aicommit = aicommit; })
+      );
 
-      aicommitPkgs = pkgs.buildGoModule {
-        name = "ai-commit";
-        src = aicommit;
-        vendorHash = "sha256-BPxPonschTe8sWc5pATAJuxpn7dgRBeVZQMHUJKpmTk=";
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        overlays = [ overlay ];
       };
-
-      nix-checkpoint = pkgs.writeShellApplication {
-        name = "nix-checkpoint";
-        runtimeInputs = [
-          aicommitPkgs
-          pkgs.findutils
-          pkgs.jq
-          nix-auto-follow.packages.x86_64-linux.default
-        ];
-        text = builtins.readFile ./nix-checkpoint.sh;
-      };
-
 
       packages = {
-        default = nix-checkpoint;
-        nix-checkpoint = nix-checkpoint;
+        default = pkgs.nix-checkpoint;
+        nix-checkpoint = pkgs.nix-checkpoint;
         formatting = treefmtEval.config.build.check self;
         snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
           mkdir -p "$out/snapshot/nested"
@@ -60,9 +50,7 @@
     {
 
       devShells.x86_64-linux.default = pkgs.mkShellNoCC {
-        buildInputs = [
-          nix-checkpoint
-        ];
+        buildInputs = [ pkgs.nix-checkpoint ];
       };
 
       packages.x86_64-linux = gcroot;
