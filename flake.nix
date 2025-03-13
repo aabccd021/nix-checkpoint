@@ -3,17 +3,13 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     nix-auto-follow.url = "github:fzakaria/nix-auto-follow";
-    aicommit = {
-      url = "github:nguyenvanduocit/ai-commit";
-      flake = false;
-    };
   };
 
-  outputs = { self, nixpkgs, aicommit, treefmt-nix, nix-auto-follow }:
+  outputs = { self, nixpkgs, treefmt-nix, nix-auto-follow }:
     let
       overlay = (final: prev:
         (nix-auto-follow.overlays.default final prev)
-        // (import ./default.nix { pkgs = final; aicommit = aicommit; })
+        // (import ./default.nix { pkgs = final; })
       );
 
       pkgs = import nixpkgs {

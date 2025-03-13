@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "aicommit": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1680116021,
-        "narHash": "sha256-XFx6mvm7FuhycWyXq9YxOsyqcxpNIr2POKqKXMefe6s=",
-        "owner": "nguyenvanduocit",
-        "repo": "ai-commit",
-        "rev": "a8981430fcbde888a378e0cd418edd55d691fb40",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nguyenvanduocit",
-        "repo": "ai-commit",
-        "type": "github"
-      }
-    },
     "nix-auto-follow": {
       "inputs": {
         "nixpkgs": "nixpkgs"
@@ -84,7 +68,6 @@
     },
     "root": {
       "inputs": {
-        "aicommit": "aicommit",
         "nix-auto-follow": "nix-auto-follow",
         "nixpkgs": "nixpkgs_2",
         "treefmt-nix": "treefmt-nix"
