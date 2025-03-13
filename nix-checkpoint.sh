@@ -110,13 +110,19 @@ fi
 
 start=$(date +%s)
 
-tmpfile=$(mktemp)
-trap 'rm -f "$tmpfile"' EXIT
+openai_api_key=${OPENAI_API_KEY:-}
+if [ -f ./openai_api_key ]; then
+  openai_api_key="$(cat ./openai_api_key)"
+fi
 
-OCO_WHY=true \
-  OCO_GITPUSH=false \
-  timeout 20 opencommit --yes >"$tmpfile" 2>&1 ||
-  git commit --edit --message "$(cat "$tmpfile")"
+if [ -z "$openai_api_key" ]; then
+  echo "OPENAI_API_KEY environment variable or openai_api_key file is required"
+  exit 1
+fi
+
+OPENAI_API_KEY="$openai_api_key" \
+  timeout 10 ai-commit --auto-commit >/dev/null 2>&1 ||
+  git commit --edit --message "checkpoint"
 
 echo "Commit message generated successfully in $(($(date +%s) - start))s"
 
