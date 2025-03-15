@@ -131,18 +131,12 @@ if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
 fi
 
 set -x
-if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
-  mkdir -p .gcroot
-  branch_name=$(git branch --show-current)
-  nohup nix build --out-link ".gcroot/$branch_name" .#gcroot </dev/null >/dev/null 2>&1 &
-
-  gcroots=$(ls -1 .gcroot)
-  for gcroot in $gcroots; do
-    echo "$gcroot"
-    branch_name=$(basename "$gcroot")
-    if ! git show-ref --verify --quiet "refs/heads/$branch_name"; then
-      echo "Deleting $gcroot"
-      rm -rf "$gcroot"
-    fi
-  done
+gcroot_exists=$(
+  echo "$flake_details" |
+    jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")" 2>/dev/null ||
+    true
+)
+if [ "$gcroot_exists" = "true" ]; then
+  rm -rf .gcroot
+  nohup nix build --out-link .gcroot .#gcroot </dev/null >/dev/null 2>&1 &
 fi
