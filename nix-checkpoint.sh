@@ -137,7 +137,7 @@ if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   branch_name=$(git branch --show-current)
   nohup nix build --out-link ".gcroot/$branch_name" .#gcroot </dev/null >/dev/null 2>&1 &
 
-  gcroots=$(ls .gcroot/*)
+  gcroots=$(ls .gcroot)
   for gcroot in $gcroots; do
     echo "$gcroot"
     branch_name=$(basename "$gcroot")
