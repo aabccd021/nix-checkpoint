@@ -142,6 +142,7 @@ if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   # delete if there is gcroots for branch that doesn't exist locally anymore
   gcroots=$(find .gcroot -mindepth 1 -maxdepth 1)
   for gcroot in $gcroots; do
+    echo "$gcroot"
     branch_name=$(basename "$gcroot")
     if ! git show-ref --verify --quiet "refs/heads/$branch_name"; then
       echo "Deleting $gcroot"
