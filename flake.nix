@@ -32,7 +32,7 @@
       };
 
       gcroot = packages // {
-        gcroot = pkgs.linkFarm "gcroot" packages;
+        gcroots = pkgs.linkFarm "gcroot" packages;
       };
 
       treefmtEval = treefmt-nix.lib.evalModule pkgs {
