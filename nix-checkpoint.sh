@@ -130,7 +130,6 @@ if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
   exit 0
 fi
 
-set -x
 gcroot_exists=$(
   echo "$flake_details" |
     jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
