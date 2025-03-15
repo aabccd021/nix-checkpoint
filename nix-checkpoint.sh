@@ -144,6 +144,7 @@ if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   for gcroot in $gcroots; do
     branch_name=$(basename "$gcroot")
     if ! git show-ref --verify --quiet "refs/heads/$branch_name"; then
+      echo "Deleting $gcroot"
       rm -rf "$gcroot"
     fi
   done
