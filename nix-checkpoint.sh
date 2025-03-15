@@ -133,8 +133,7 @@ fi
 set -x
 gcroot_exists=$(
   echo "$flake_details" |
-    jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")" 2>/dev/null ||
-    true
+    jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
 )
 if [ "$gcroot_exists" = "true" ]; then
   rm -rf .gcroot
