@@ -135,6 +135,7 @@ gcroot_exists=$(
     jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
 )
 if [ "$gcroot_exists" = "true" ]; then
+  echo hit
   rm -rf .gcroot
   nohup nix build --out-link .gcroot .#gcroot </dev/null >/dev/null 2>&1 &
 fi
