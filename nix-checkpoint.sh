@@ -140,6 +140,7 @@ if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   done
 
   # delete if there is gcroots for branch that doesn't exist locally anymore
+  set -x
   gcroots=$(find .gcroot -mindepth 1 -maxdepth 1)
   for gcroot in $gcroots; do
     echo "$gcroot"
