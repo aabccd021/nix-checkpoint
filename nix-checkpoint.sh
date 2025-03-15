@@ -136,7 +136,7 @@ if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   rm -rf .gcroot
   mkdir -p .gcroot
   branch_name=$(git branch --show-current)
-  # nohup nix build --out-link ".gcroot/$branch_name" .#gcroot </dev/null >/dev/null 2>&1 &
+  nohup nix build --out-link ".gcroot/$branch_name" .#gcroot </dev/null >/dev/null 2>&1 &
 
   # delete if there is gcroots for branch that doesn't exist locally anymore
   gcroots=$(find .gcroot -mindepth 1 -maxdepth 1)
