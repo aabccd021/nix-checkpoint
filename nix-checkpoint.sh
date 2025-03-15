@@ -131,6 +131,7 @@ if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
 fi
 
 set -x
+echo "$packages"
 if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   rm -rf .gcroot
   mkdir -p .gcroot
