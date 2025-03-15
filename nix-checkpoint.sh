@@ -130,24 +130,21 @@ if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
   exit 0
 fi
 
-nixosConfigurations=$(
-  echo "$flake_details" |
-    jq --raw-output ".nixosConfigurations | keys | .[]" 2>/dev/null ||
-    true
-)
-package_gcroots=$(echo "$packages" | grep '^gcroot-' || true)
-nixosConfiguration_gcroots=$(
-  echo "$nixosConfigurations" |
-    grep '^gcroot-' |
-    sed 's/^/.nixosConfigurations./g' |
-    sed 's/$/.config.system.build.toplevel/g' ||
-    true
-)
-gcroots="$package_gcroots $nixosConfiguration_gcroots"
-if [ -n "$gcroots" ]; then
+# if "gcroot" is in packages
+if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   rm -rf .gcroot
   mkdir -p .gcroot
+  branch_name=$(git branch --show-current)
   for gcroot in $gcroots; do
-    nohup nix build --out-link ".gcroot/$gcroot" .#"$gcroot" </dev/null >/dev/null 2>&1 &
+    nohup nix build --out-link ".gcroot/$branch_name" .#gcroot </dev/null >/dev/null 2>&1 &
+  done
+
+  # delete if there is gcroots for branch that doesn't exist locally anymore
+  gcroots=$(find .gcroot -mindepth 1 -maxdepth 1)
+  for gcroot in $gcroots; do
+    branch_name=$(basename "$gcroot")
+    if ! git show-ref --verify --quiet "refs/heads/$branch_name"; then
+      rm -rf "$gcroot"
+    fi
   done
 fi
