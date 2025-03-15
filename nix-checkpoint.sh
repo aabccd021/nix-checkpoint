@@ -130,7 +130,7 @@ if [ "$flag" = "--push" ] || [ "$flag" = "--no-gcroot" ]; then
   exit 0
 fi
 
-# if "gcroot" is in packages
+set -x
 if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   rm -rf .gcroot
   mkdir -p .gcroot
@@ -138,7 +138,6 @@ if [ -n "$(echo "$packages" | grep '^gcroot$' || true)" ]; then
   # nohup nix build --out-link ".gcroot/$branch_name" .#gcroot </dev/null >/dev/null 2>&1 &
 
   # delete if there is gcroots for branch that doesn't exist locally anymore
-  set -x
   gcroots=$(find .gcroot -mindepth 1 -maxdepth 1)
   for gcroot in $gcroots; do
     echo "$gcroot"
