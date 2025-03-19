@@ -98,10 +98,14 @@ if [ "$flag" = "--fmt" ] || [ "$flag" = "--no-check" ]; then
   exit 0
 fi
 
-start=$(date +%s)
-git add --all >/dev/null
-nix flake check --quiet || (git reset >/dev/null && exit 1)
-echo "nix flake check finished successfully in $(($(date +%s) - start))s"
+if [ "$flag" != "--skip-check" ]; then
+
+  start=$(date +%s)
+  git add --all >/dev/null
+  nix flake check --quiet || (git reset >/dev/null && exit 1)
+  echo "nix flake check finished successfully in $(($(date +%s) - start))s"
+
+fi
 
 if [ "$flag" = "--check" ] || [ "$flag" = "--no-commit" ]; then
   git reset >/dev/null
