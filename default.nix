@@ -16,7 +16,6 @@ in
       aicommitPkgs
       pkgs.findutils
       pkgs.jq
-      pkgs.all-follow
     ];
     text = builtins.readFile ./nix-checkpoint.sh;
   };
