@@ -141,5 +141,5 @@ if [ "$gcroot_exists" = "true" ]; then
 fi
 
 if command -v notify-send >/dev/null 2>&1; then
-  notify-send "Finished running nix-checkpoint"
+  notify-send --urgency=low "Finished running nix-checkpoint"
 fi
