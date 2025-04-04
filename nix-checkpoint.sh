@@ -139,3 +139,7 @@ if [ "$gcroot_exists" = "true" ]; then
   rm -rf .gcroot
   nohup nix build --out-link .gcroot .#gcroot </dev/null >/dev/null 2>&1 &
 fi
+
+if command -v notify-send >/dev/null 2>&1; then
+  notify-send "Finished running nix-checkpoint"
+fi
