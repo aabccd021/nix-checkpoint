@@ -17,22 +17,6 @@
         overlays = [ overlay ];
       };
 
-      scripts = {
-        default = pkgs.nix-checkpoint;
-        nix-checkpoint = pkgs.nix-checkpoint;
-        formatting = treefmtEval.config.build.check self;
-        snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
-          mkdir -p "$out/snapshot/nested"
-          echo "hello" > "$out/snapshot/nested/file.txt"
-        '';
-        fix = pkgs.writeShellScript "fix" ''
-          echo "running fix"
-          sleep 1
-          echo "done fix"
-        '';
-
-      };
-
       treefmtEval = treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
         programs.nixpkgs-fmt.enable = true;
@@ -49,9 +33,21 @@
         buildInputs = [ pkgs.nixd ];
       };
 
-      packages = scripts // devShells // {
+      packages = devShells // {
         formatting = treefmtEval.config.build.check self;
         formatter = formatter;
+        default = pkgs.nix-checkpoint;
+        nix-checkpoint = pkgs.nix-checkpoint;
+        snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
+          mkdir -p "$out/snapshot/nested"
+          echo "hello" > "$out/snapshot/nested/file.txt"
+        '';
+        fix = pkgs.writeShellScript "fix" ''
+          echo "running fix"
+          sleep 1
+          echo "done fix"
+        '';
+
       };
 
     in
