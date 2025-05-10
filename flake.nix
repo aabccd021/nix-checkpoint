@@ -17,7 +17,7 @@
         overlays = [ overlay ];
       };
 
-      packages = {
+      scripts = {
         default = pkgs.nix-checkpoint;
         nix-checkpoint = pkgs.nix-checkpoint;
         formatting = treefmtEval.config.build.check self;
@@ -33,10 +33,6 @@
 
       };
 
-      gcroot = packages // {
-        gcroot = pkgs.linkFarm "gcroot" packages;
-      };
-
       treefmtEval = treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
         programs.nixpkgs-fmt.enable = true;
@@ -47,22 +43,29 @@
         settings.global.excludes = [ "LICENSE" ];
       };
 
+      formatter = treefmtEval.config.build.wrapper;
+
+      devShells.default = pkgs.mkShellNoCC {
+        buildInputs = [ pkgs.nixd ];
+      };
+
+      packages = scripts // devShells // {
+        formatting = treefmtEval.config.build.check self;
+        formatter = formatter;
+      };
+
     in
 
     {
 
-      devShells.x86_64-linux.default = pkgs.mkShellNoCC {
-        buildInputs = [ pkgs.nix-checkpoint ];
+      packages.x86_64-linux = packages // {
+        gcroot = pkgs.linkFarm "gcroot" packages;
       };
 
+      checks.x86_64-linux = packages;
+      formatter.x86_64-linux = formatter;
       overlays.default = overlay;
-
-      packages.x86_64-linux = gcroot;
-
-      checks.x86_64-linux = gcroot;
-
-      formatter.x86_64-linux = treefmtEval.config.build.wrapper;
-
+      devShells.x86_64-linux = devShells;
 
     };
 }
