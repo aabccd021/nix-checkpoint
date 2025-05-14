@@ -66,12 +66,17 @@ if [ "$flag" = "--no-fix" ]; then
   exit 0
 fi
 
-fix=$(
+fix_apps=$(
   echo "$flake_details" |
     jq --raw-output ".apps[\"$system\"][\"fix\"] | keys | .[]" 2>/dev/null ||
     true
 )
-if [ -n "$fix" ]; then
+fix_packages=$(
+  echo "$flake_details" |
+    jq --raw-output ".packages[\"$system\"][\"fix\"] | keys | .[]" 2>/dev/null ||
+    true
+)
+if [ -n "$fix_apps" ] || [ -n "$fix_packages" ]; then
   start=$(date +%s)
   nix run ".#fix"
   echo "nix run .#fix finished successfully in $(($(date +%s) - start))s"
