@@ -39,7 +39,6 @@
           echo "hello" > "$out/snapshot/nested/file.txt"
         '';
         fix = pkgs.writeShellScriptBin "fix" ''
-          set -x
           echo "running fix"
           sleep 1
           echo "done fix"
