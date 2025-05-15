@@ -7,7 +7,9 @@ git add --all >/dev/null
 
 system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 
+start=$(date +%s)
 flake_details=$(nix flake show --json)
+echo "nix flake show finished successfully in $(($(date +%s) - start))s"
 
 packages=$(
   echo "$flake_details" |

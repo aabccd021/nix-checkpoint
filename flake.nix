@@ -1,12 +1,8 @@
 {
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
-    aicommit = {
-      url = "github:nguyenvanduocit/ai-commit";
-      flake = false;
-    };
-  };
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.treefmt-nix.url = "github:numtide/treefmt-nix";
+  inputs.aicommit.url = "github:nguyenvanduocit/ai-commit";
+  inputs.aicommit.flake = false;
 
   outputs = { self, nixpkgs, aicommit, treefmt-nix }:
     let
@@ -42,12 +38,12 @@
           mkdir -p "$out/snapshot/nested"
           echo "hello" > "$out/snapshot/nested/file.txt"
         '';
-        fix = pkgs.writeShellScript "fix" ''
+        fix = pkgs.writeShellScriptBin "fix" ''
+          set -x
           echo "running fix"
           sleep 1
           echo "done fix"
         '';
-
       };
 
     in
