@@ -52,10 +52,7 @@ if [ -n "$new_files" ] && [ ! -f "/tmp/$new_files_hashed" ]; then
   touch "/tmp/$new_files_hashed"
 fi
 
-printf "git add --all"
-start=$(date +%s)
 git add --all >/dev/null
-echo " ($(($(date +%s) - start))s)"
 
 fix_apps=$(
   echo "$flake_details" |
@@ -83,10 +80,7 @@ if [ -n "$has_formatter" ] && [ "$has_formatter" != "null" ]; then
   echo " ($(($(date +%s) - start))s)"
 fi
 
-printf "git add --all"
-start=$(date +%s)
 git add --all >/dev/null
-echo " ($(($(date +%s) - start))s)"
 
 printf "nix flake check --quiet"
 start=$(date +%s)
