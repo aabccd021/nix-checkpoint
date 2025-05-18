@@ -7,7 +7,7 @@ system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 
 start=$(date +%s)
 flake_details=$(nix flake show --json)
-echo nix flake show --json" [$(($(date +%s) - start))s]"
+echo "[$(($(date +%s) - start))s] nix flake show --json"
 
 packages=$(
   echo "$flake_details" |
@@ -21,7 +21,7 @@ if [ -n "$snapshots" ]; then
 
     start=$(date +%s)
     result=$(nix build --no-link --print-out-paths ".#$snapshot")
-    echo "nix build --no-link --print-out-paths .#$snapshot [$(($(date +%s) - start))s]"
+    echo "[$(($(date +%s) - start))s] nix build --no-link --print-out-paths .#$snapshot"
 
     files=$(find -L "$result" -type f -printf '%P\n')
     for file in $files; do
@@ -65,7 +65,7 @@ fix_packages=$(
 if [ -n "$fix_apps" ] || [ -n "$fix_packages" ]; then
   start=$(date +%s)
   nix run ".#fix"
-  echo "nix run .#fix [$(($(date +%s) - start))s]"
+  echo "[$(($(date +%s) - start))s] nix run .#fix"
 fi
 
 has_formatter=$(echo "$flake_details" |
@@ -73,29 +73,29 @@ has_formatter=$(echo "$flake_details" |
 if [ -n "$has_formatter" ] && [ "$has_formatter" != "null" ]; then
   start=$(date +%s)
   nix fmt
-  echo "nix fmt [$(($(date +%s) - start))s]"
+  echo "[$(($(date +%s) - start))s] nix fmt"
 fi
 
 git add --all >/dev/null
 
 start=$(date +%s)
 nix flake check --quiet || (git reset >/dev/null && exit 1)
-echo "nix flake check --quiet [$(($(date +%s) - start))s]"
+echo "[$(($(date +%s) - start))s] nix flake check --quiet"
 
 start=$(date +%s)
 timeout 10 ai-commit --auto-commit >/dev/null 2>&1 ||
   git commit --edit --message "checkpoint"
-echo "ai-commit --auto-commit [$(($(date +%s) - start))s]"
+echo "[$(($(date +%s) - start))s] ai-commit --auto-commit"
 
 rm "/tmp/$new_files_hashed" 2>/dev/null || true
 
 start=$(date +%s)
 git pull --quiet --rebase
-echo "git pull --quiet --rebase [$(($(date +%s) - start))s]"
+echo "[$(($(date +%s) - start))s] git pull --quiet --rebase"
 
 start=$(date +%s)
 git push --quiet
-echo "git push --quiet [$(($(date +%s) - start))s]"
+echo "[$(($(date +%s) - start))s] git push --quiet"
 
 gcroot_exists=$(
   echo "$flake_details" |
@@ -106,7 +106,7 @@ if [ "$gcroot_exists" = "true" ]; then
 
   start=$(date +%s)
   nix build --out-link .gcroot .#gcroot
-  echo "nix build --out-link .gcroot .#gcroot [$(($(date +%s) - start))s]"
+  echo "[$(($(date +%s) - start))s] nix build --out-link .gcroot .#gcroot"
 fi
 
 if command -v notify-send >/dev/null 2>&1; then
