@@ -102,9 +102,7 @@ gcroot_exists=$(
     jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
 )
 if [ "$gcroot_exists" = "true" ]; then
-  start=$(date +%s)
-  nix build --out-link .gcroot .#gcroot
-  echo "[$(($(date +%s) - start))s] nix build .#gcroot"
+  nohup nix build --out-link .gcroot .#gcroot </dev/null >/dev/null 2>&1 &
 fi
 
 notify-send --urgency=low "Finished running nix-checkpoint" >/dev/null 2>&1 || true
