@@ -7,7 +7,7 @@ system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
 
 start=$(date +%s)
 flake_details=$(nix flake show --json)
-echo "[$(($(date +%s) - start))s] nix flake show --json"
+echo "[$(($(date +%s) - start))s] nix flake show"
 
 packages=$(
   echo "$flake_details" |
@@ -21,7 +21,7 @@ if [ -n "$snapshots" ]; then
 
     start=$(date +%s)
     result=$(nix build --no-link --print-out-paths ".#$snapshot")
-    echo "[$(($(date +%s) - start))s] nix build --no-link --print-out-paths .#$snapshot"
+    echo "[$(($(date +%s) - start))s] nix build .#$snapshot"
 
     files=$(find -L "$result" -type f -printf '%P\n')
     for file in $files; do
@@ -80,35 +80,31 @@ git add --all >/dev/null
 
 start=$(date +%s)
 nix flake check --quiet || (git reset >/dev/null && exit 1)
-echo "[$(($(date +%s) - start))s] nix flake check --quiet"
+echo "[$(($(date +%s) - start))s] nix flake check"
 
 start=$(date +%s)
 timeout 10 ai-commit --auto-commit >/dev/null 2>&1 ||
   git commit --edit --message "checkpoint"
-echo "[$(($(date +%s) - start))s] ai-commit --auto-commit"
+echo "[$(($(date +%s) - start))s] ai-commit"
 
 rm "/tmp/$new_files_hashed" 2>/dev/null || true
 
 start=$(date +%s)
 git pull --quiet --rebase
-echo "[$(($(date +%s) - start))s] git pull --quiet --rebase"
+echo "[$(($(date +%s) - start))s] git pull"
 
 start=$(date +%s)
 git push --quiet
-echo "[$(($(date +%s) - start))s] git push --quiet"
+echo "[$(($(date +%s) - start))s] git push"
 
 gcroot_exists=$(
   echo "$flake_details" |
     jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
 )
 if [ "$gcroot_exists" = "true" ]; then
-  rm -rf .gcroot
-
   start=$(date +%s)
   nix build --out-link .gcroot .#gcroot
-  echo "[$(($(date +%s) - start))s] nix build --out-link .gcroot .#gcroot"
+  echo "[$(($(date +%s) - start))s] nix build .#gcroot"
 fi
 
-if command -v notify-send >/dev/null 2>&1; then
-  notify-send --urgency=low "Finished running nix-checkpoint"
-fi
+notify-send --urgency=low "Finished running nix-checkpoint" >/dev/null 2>&1 || true
