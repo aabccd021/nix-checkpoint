@@ -1,12 +1,17 @@
 root=$(git rev-parse --show-toplevel)
 trap 'cd $(pwd)' EXIT
 cd "$root" || exit
+
+flags="$*"
+
 git add --all >/dev/null
 
-system=$(nix eval --impure --raw --expr 'builtins.currentSystem')
+# shellcheck disable=SC2086
+system=$(nix $flags eval --impure --raw --expr 'builtins.currentSystem')
 
 start=$(date +%s)
-flake_details=$(nix flake show --json)
+# shellcheck disable=SC2086
+flake_details=$(nix $flags flake show --json)
 echo "[$(($(date +%s) - start))s] nix flake show"
 
 packages=$(
@@ -20,7 +25,8 @@ if [ -n "$snapshots" ]; then
   for snapshot in $snapshots; do
 
     start=$(date +%s)
-    result=$(nix build --no-link --print-out-paths ".#$snapshot")
+    # shellcheck disable=SC2086
+    result=$(nix $flags build --no-link --print-out-paths ".#$snapshot")
     echo "[$(($(date +%s) - start))s] nix build .#$snapshot"
 
     files=$(find -L "$result" -type f -printf '%P\n')
@@ -64,7 +70,8 @@ fix_packages=$(
 )
 if [ -n "$fix_apps" ] || [ -n "$fix_packages" ]; then
   start=$(date +%s)
-  nix run ".#fix"
+  # shellcheck disable=SC2086
+  nix $flags run ".#fix"
   echo "[$(($(date +%s) - start))s] nix run .#fix"
 fi
 
@@ -72,14 +79,16 @@ has_formatter=$(echo "$flake_details" |
   jq ".formatter[\"$system\"]" 2>/dev/null || true)
 if [ -n "$has_formatter" ] && [ "$has_formatter" != "null" ]; then
   start=$(date +%s)
-  nix fmt
+  # shellcheck disable=SC2086
+  nix $flags fmt
   echo "[$(($(date +%s) - start))s] nix fmt"
 fi
 
 git add --all >/dev/null
 
 start=$(date +%s)
-nix flake check --quiet || (git reset >/dev/null && exit 1)
+# shellcheck disable=SC2086
+nix $flags flake check --quiet || (git reset >/dev/null && exit 1)
 echo "[$(($(date +%s) - start))s] nix flake check"
 
 start=$(date +%s)
