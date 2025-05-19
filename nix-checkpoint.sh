@@ -1,3 +1,5 @@
+set -x
+
 root=$(git rev-parse --show-toplevel)
 trap 'cd $(pwd)' EXIT
 cd "$root" || exit
