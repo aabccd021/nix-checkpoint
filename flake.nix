@@ -4,9 +4,21 @@
   inputs.aicommit.url = "github:nguyenvanduocit/ai-commit";
   inputs.aicommit.flake = false;
 
-  outputs = { self, nixpkgs, aicommit, treefmt-nix }:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      aicommit,
+      treefmt-nix,
+    }:
     let
-      overlay = (final: prev: import ./default.nix { pkgs = final; aicommit = aicommit; });
+      overlay = (
+        final: prev:
+        import ./default.nix {
+          pkgs = final;
+          aicommit = aicommit;
+        }
+      );
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
@@ -15,11 +27,14 @@
 
       treefmtEval = treefmt-nix.lib.evalModule pkgs {
         projectRootFile = "flake.nix";
-        programs.nixpkgs-fmt.enable = true;
+        programs.nixfmt.enable = true;
         programs.prettier.enable = true;
         programs.shfmt.enable = true;
         programs.shellcheck.enable = true;
-        settings.formatter.shellcheck.options = [ "-s" "sh" ];
+        settings.formatter.shellcheck.options = [
+          "-s"
+          "sh"
+        ];
         settings.global.excludes = [ "LICENSE" ];
       };
 
