@@ -12,7 +12,7 @@
       treefmt-nix,
     }:
     let
-      overlay = (
+      overlays.default = (
         final: prev:
         import ./default.nix {
           pkgs = final;
@@ -22,7 +22,7 @@
 
       pkgs = import nixpkgs {
         system = "x86_64-linux";
-        overlays = [ overlay ];
+        overlays = [ overlays.default ];
       };
 
       treefmtEval = treefmt-nix.lib.evalModule pkgs {
@@ -70,7 +70,7 @@
 
       checks.x86_64-linux = packages;
       formatter.x86_64-linux = formatter;
-      overlays.default = overlay;
+      overlays = overlays;
       devShells.x86_64-linux = devShells;
 
     };
