@@ -1,4 +1,6 @@
-if [ -n "$(git status --porcelain)" ]; then
+changes=$(git status --porcelain)
+
+if [ -n "$changes" ]; then
 
   root=$(git rev-parse --show-toplevel)
   trap 'cd $(pwd)' EXIT
@@ -110,12 +112,14 @@ start=$(date +%s)
 git push --quiet
 echo "[$(($(date +%s) - start))s] git push"
 
-gcroot_exists=$(
-  echo "$flake_details" |
-    jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
-)
-if [ "$gcroot_exists" = "true" ]; then
-  nohup nix build --out-link .gcroot .#gcroot </dev/null >/dev/null 2>&1 &
+if [ -n "$flake_details" ]; then
+  gcroot_exists=$(
+    echo "$flake_details" |
+      jq --raw-output ".packages[\"$system\"] | has(\"gcroot\")"
+  )
+  if [ "$gcroot_exists" = "true" ]; then
+    nohup nix build --out-link .gcroot .#gcroot </dev/null >/dev/null 2>&1 &
+  fi
 fi
 
 notify-send --urgency=low "Finished running nix-checkpoint" >/dev/null 2>&1 || true
