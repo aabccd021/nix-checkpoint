@@ -1,5 +1,5 @@
-if [ -z "$(git diff --cached --name-only)" ]; then
-  echo "No changes detected, exiting."
+if [ -z "$(git status --porcelain)" ]; then
+  echo "No git changes or untracked files to commit."
   exit 0
 fi
 
