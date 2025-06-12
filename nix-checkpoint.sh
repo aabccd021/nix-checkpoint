@@ -1,3 +1,8 @@
+if [ -z "$(git diff --cached --name-only)" ]; then
+  echo "No changes detected, exiting."
+  exit 0
+fi
+
 root=$(git rev-parse --show-toplevel)
 trap 'cd $(pwd)' EXIT
 cd "$root" || exit
