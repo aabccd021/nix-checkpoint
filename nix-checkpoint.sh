@@ -1,5 +1,7 @@
 changes=$(git status --porcelain)
 
+flake_details=""
+
 if [ -n "$changes" ]; then
 
   root=$(git rev-parse --show-toplevel)
