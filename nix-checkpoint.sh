@@ -1,3 +1,10 @@
+target=${1:-}
+if [ -n "$target" ]; then
+  shift
+else
+  target="path:$PWD"
+fi
+
 root=$(git rev-parse --show-toplevel)
 trap 'cd $(pwd)' EXIT
 cd "$root" || exit
@@ -11,7 +18,7 @@ system=$(nix $flags eval --impure --raw --expr 'builtins.currentSystem')
 
 start=$(date +%s)
 # shellcheck disable=SC2086
-flake_details=$(nix $flags flake show --json)
+flake_details=$(nix $flags flake show --json "$target")
 echo "[$(($(date +%s) - start))s] nix flake show"
 
 packages=$(
