@@ -58,21 +58,21 @@ fi
 
 git add --all >/dev/null
 
-preformat_apps=$(
+prefmt_apps=$(
   echo "$flake_details" |
-    jq --raw-output ".apps[\"$system\"][\"preformat\"] | keys | .[]" 2>/dev/null ||
+    jq --raw-output ".apps[\"$system\"][\"prefmt\"] | keys | .[]" 2>/dev/null ||
     true
 )
-preformat_packages=$(
+prefmt_packages=$(
   echo "$flake_details" |
-    jq --raw-output ".packages[\"$system\"][\"preformat\"] | keys | .[]" 2>/dev/null ||
+    jq --raw-output ".packages[\"$system\"][\"prefmt\"] | keys | .[]" 2>/dev/null ||
     true
 )
-if [ -n "$preformat_apps" ] || [ -n "$preformat_packages" ]; then
+if [ -n "$prefmt_apps" ] || [ -n "$prefmt_packages" ]; then
   start=$(date +%s)
   # shellcheck disable=SC2086
-  nix $flags run ".#preformat"
-  echo "[$(($(date +%s) - start))s] nix run .#preformat"
+  nix $flags run ".#prefmt"
+  echo "[$(($(date +%s) - start))s] nix run .#prefmt"
 fi
 
 has_formatter=$(echo "$flake_details" |

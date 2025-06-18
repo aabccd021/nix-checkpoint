@@ -63,10 +63,10 @@
           mkdir -p "$out/snapshot/nested"
           echo "hello" > "$out/snapshot/nested/file.txt"
         '';
-        fix = pkgs.writeShellScriptBin "fix" ''
-          echo "running fix"
+        prefmt = pkgs.writeShellScriptBin "prefmt" ''
+          echo "running prefmt"
           sleep 1
-          echo "done fix"
+          echo "done prefmt"
         '';
       };
 
