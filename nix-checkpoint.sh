@@ -58,17 +58,12 @@ fi
 
 git add --all >/dev/null
 
-prefmt_apps=$(
-  echo "$flake_details" |
-    jq --raw-output ".apps[\"$system\"][\"prefmt\"] | keys | .[]" 2>/dev/null ||
-    true
-)
-prefmt_packages=$(
+prefmt=$(
   echo "$flake_details" |
     jq --raw-output ".packages[\"$system\"][\"prefmt\"] | keys | .[]" 2>/dev/null ||
     true
 )
-if [ -n "$prefmt_apps" ] || [ -n "$prefmt_packages" ]; then
+if [ -n "$prefmt" ]; then
   start=$(date +%s)
   # shellcheck disable=SC2086
   nix $flags run ".#prefmt"
