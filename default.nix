@@ -10,7 +10,7 @@ in
 
 {
 
-  aicommit = aicommit;
+  aicommit = aicommitPkgs;
 
   nix-checkpoint = pkgs.writeShellApplication {
     name = "nix-checkpoint";
