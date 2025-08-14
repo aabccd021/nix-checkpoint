@@ -10,6 +10,8 @@ in
 
 {
 
+  aicommit = aicommit;
+
   nix-checkpoint = pkgs.writeShellApplication {
     name = "nix-checkpoint";
     runtimeInputs = [
