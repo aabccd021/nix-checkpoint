@@ -94,7 +94,7 @@ echo "[$(($(date +%s) - start))s] ai-commit"
 rm "/tmp/$new_files_hashed" 2>/dev/null || true
 
 start=$(date +%s)
-git pull --quiet --rebase
+git pull --quiet --rebase --strategy-option=ours
 echo "[$(($(date +%s) - start))s] git pull"
 
 start=$(date +%s)
