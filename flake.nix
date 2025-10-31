@@ -59,7 +59,7 @@
         allInputs = collectInputs inputs;
         default = pkgs.nix-checkpoint;
         nix-checkpoint = pkgs.nix-checkpoint;
-        snapshot-test = pkgs.runCommandNoCCLocal "snapshot-test" { } ''
+        snapshot-test = pkgs.runCommand "snapshot-test" { } ''
           mkdir -p "$out/snapshot/nested"
           echo "hello" > "$out/snapshot/nested/file.txt"
         '';
